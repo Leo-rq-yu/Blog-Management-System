@@ -209,7 +209,7 @@ export const DEFAULT_BLOG_CONTENT: { blocks: Block[] } = {
       "id": "-0quBl4snX",
       "type": "image",
       "data": {
-        "url": "https://aristai-static-resources.s3.us-east-2.amazonaws.com/assets/newsroom/f7c9790b3139a8f22c06ff0740241f64.png",
+        "url": "https://d43vvod2st23c.cloudfront.net/f7c9790b3139a8f22c06ff0740241f64.png",
         "caption": "This is a caption",
         "withBorder": false,
         "withBackground": false,
@@ -264,7 +264,7 @@ export const DEFAULT_BLOG: Blog = {
   tag: "example",
   status: "draft",
   keywords: null,
-  cover_image_url: "https://d2hp1ftv5ri2om.cloudfront.net/assets/newsroom/images/321e4197-9736-44da-ba1f-eb8cb7d95520.jpg",
+  cover_image_url: "https://d43vvod2st23c.cloudfront.net/786a96cc99325729ea6e40300fed3ab3.jpg",
   description:
     "This is an example card showing how your blogs will appear once you create them.",
   created_at: "2025-03-19T00:00:00.000Z",
