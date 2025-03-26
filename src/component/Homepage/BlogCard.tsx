@@ -24,7 +24,6 @@ const converTime = (time: string) => {
 };
 
 const BlogCard = ({ blog }: BlogCardProps) => {
-  console.log(blog);
   const router = useRouter();
   const [confirmModal, setConfirmModal] = useState(false);
   const [editModal, setEditModal] = useState(false);
@@ -52,7 +51,6 @@ const BlogCard = ({ blog }: BlogCardProps) => {
   };
 
   const handleCancel = () => {
-    console.log("Delete canceled");
     setConfirmModal(false);
   };
 

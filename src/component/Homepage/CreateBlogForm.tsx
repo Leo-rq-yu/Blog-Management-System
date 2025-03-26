@@ -44,7 +44,6 @@ const CreateBlogForm = ({ closeModel }: CreateBlogFormProps) => {
 
   const handleSubmit = async (values: FieldType) => {
     setLoading(true);
-    console.log(values);
     if ((values.cover_image_url ?? []).length > 1) {
       api.error({
         message: "Please upload only one image",
@@ -75,7 +74,6 @@ const CreateBlogForm = ({ closeModel }: CreateBlogFormProps) => {
     }
 
     const data: { id: string } = await response.json();
-    console.log(data);
     setLoading(false);
     router.push(`/editor/${data.id}`);
     closeModel();
@@ -151,7 +149,6 @@ const CreateBlogForm = ({ closeModel }: CreateBlogFormProps) => {
                   api.success({
                     message: `${info.file.name} file uploaded successfully.`,
                   });
-                  console.log(response);
                   if (response && response.success) {
                     // Update the form field with the returned URL
                     const url = response.file.url;

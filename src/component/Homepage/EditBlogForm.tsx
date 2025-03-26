@@ -32,7 +32,6 @@ interface EditBlogFormProps {
 }
 
 const EditBlogForm = ({ closeModel, blog }: EditBlogFormProps) => {
-  console.log(blog);
   const router = useRouter();
   const [form] = Form.useForm();
   const [api, contextHolder] = notification.useNotification();
@@ -47,7 +46,6 @@ const EditBlogForm = ({ closeModel, blog }: EditBlogFormProps) => {
 
   const handleSubmit = async (values: any) => {
     setLoading(true);
-    console.log(values);
     if ((values.cover_image_url ?? []).length > 1) {
       api.error({
         message: "Please upload only one image",
@@ -75,8 +73,7 @@ const EditBlogForm = ({ closeModel, blog }: EditBlogFormProps) => {
       return;
     }
 
-    const data: { id: string } = await response.json();
-    console.log(data);
+    await response.json();
     setLoading(false);
     router.refresh();
     closeModel();
@@ -89,7 +86,6 @@ const EditBlogForm = ({ closeModel, blog }: EditBlogFormProps) => {
         <Form
           form={form}
           layout="vertical"
-          onSubmitCapture={() => console.log("Submiting")}
           onFinish={handleSubmit}
           initialValues={{
             title: blog.title,
@@ -173,7 +169,6 @@ const EditBlogForm = ({ closeModel, blog }: EditBlogFormProps) => {
                   api.success({
                     message: `${info.file.name} file uploaded successfully.`,
                   });
-                  console.log(response);
                   if (response && response.success) {
                     // Update the form field with the returned URL
                     form.setFieldsValue({
@@ -211,7 +206,6 @@ const EditBlogForm = ({ closeModel, blog }: EditBlogFormProps) => {
               type="primary"
               htmlType="submit"
               block
-              onClick={() => console.log("Submit")}
             >
               Submit
             </Button>

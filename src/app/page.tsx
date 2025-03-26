@@ -10,13 +10,11 @@ export const fetchCache = "force-no-store";
 async function getBlogs(): Promise<Blog[]> {
   const response = await fetch(process.env.NEXT_PUBLIC_DOMAIN + "/api/blog");
   const blogs = await response.json();
-  console.log(blogs);
   return blogs;
 }
 
 export default async function Home() {
   const blogs: Blog[] = await getBlogs();
-  // await getBlogs();
   return (
     <div className="min-h-screen bg-zinc-50 flex flex-col">
       <header className="bg-white shadow fixed top-0 left-0 right-0 z-10">

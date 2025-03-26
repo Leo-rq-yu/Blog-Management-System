@@ -25,114 +25,112 @@ const streamToString = async (stream: Readable): Promise<string> =>
 
 // Get the blog with id
 export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
-  console.log("GET blog content");
-  const { id } = await params;
-  console.log(id);
+  try {
+    const { id } = await params;
 
-  // get blog meta data
-  const blog = await sql`SELECT * FROM blogs WHERE id = ${id}`;
-  if (blog.length === 0) {
-    return NextResponse.json({ message: 'Blog not found' }, { status: 404 });
+    // get blog meta data
+    const blog = await sql`SELECT * FROM blogs WHERE id = ${id}`;
+    if (blog.length === 0) {
+      return NextResponse.json({ message: 'Blog not found' }, { status: 404 });
+    }
+    const recordTag = blog[0].tag;
+    const s3Route = `${recordTag}/${id}.json`;
+
+    const command = new GetObjectCommand({
+      Bucket: process.env.NEXT_PUBLIC_S3_BUCKET_NAME,
+      Key: s3Route,
+    });
+    const s3Response = await s3.send(command);
+
+    const bodyContents = s3Response.Body ? await streamToString(s3Response.Body as Readable) : null;
+    if (!bodyContents) {
+      return NextResponse.json({ message: 'Blog content not found' }, { status: 404 });
+    }
+
+    const blogContent = JSON.parse(bodyContents);
+    return NextResponse.json({ ...blog[0], blocks: blogContent }, { status: 200 });
+  } catch (error) {
+    console.log("Error:", error);
+    return NextResponse.json({ message: 'An error occurred in get a blog' }, { status: 500 });
   }
-  console.log(blog);
-  const recordTag = blog[0].tag;
-  console.log(recordTag);
-  const s3Route = `assets/newsroom/${recordTag}/${id}.json`;
-  console.log(s3Route);
-
-  const command = new GetObjectCommand({
-    Bucket: process.env.NEXT_PUBLIC_S3_BUCKET_NAME,
-    Key: s3Route,
-  });
-  const s3Response = await s3.send(command);
-
-  const bodyContents = s3Response.Body ? await streamToString(s3Response.Body as Readable) : null;
-  if (!bodyContents) {
-    return NextResponse.json({ message: 'Blog content not found' }, { status: 404 });
-  }
-
-  const blogContent = JSON.parse(bodyContents);
-  console.log("Get data from S3");
-  console.log(blogContent);
-  return NextResponse.json({ ...blog[0], blocks: blogContent }, { status: 200 });
 }
 
 // Update blog content with id to S3
 export async function POST(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
-  const { id } = await params;
-  console.log(id);
-  const { tag, content } = await req.json();
-  console.log(tag, content);
-  const s3Route = `assets/newsroom/${tag}/${id}.json`;
-  const upload = new Upload({
-    client: s3,
-    params: {
-      Bucket: process.env.NEXT_PUBLIC_S3_BUCKET_NAME,
-      Key: s3Route,
-      Body: JSON.stringify(content),
-      ContentType: "application/json",
-    },
-  });
+  try {
+    const { id } = await params;
+    const { tag, content } = await req.json();
+    const s3Route = `/${tag}/${id}.json`;
+    const upload = new Upload({
+      client: s3,
+      params: {
+        Bucket: process.env.NEXT_PUBLIC_S3_BUCKET_NAME,
+        Key: s3Route,
+        Body: JSON.stringify(content),
+        ContentType: "application/json",
+      },
+    });
 
-  const result = await upload.done();
-  console.log(result);
+    await upload.done();
 
-  //update updated_at in blogs
-  const updated_at = Date.now();
-  console.log(updated_at);
-  const updateResult = await sql`UPDATE blogs SET updated_at = TO_TIMESTAMP(${updated_at / 1000}) WHERE id = ${id}`;
-  console.log(updateResult);
+    const updated_at = Date.now();
+    await sql`UPDATE blogs SET updated_at = TO_TIMESTAMP(${updated_at / 1000}) WHERE id = ${id}`;
 
-  return NextResponse.json({ id });
+    return NextResponse.json({ id });
+  } catch (error) {
+    console.log("Error:", error);
+    return NextResponse.json({ message: 'An error occurred in update blog content' }, { status: 500 });
+  }
 };
 
 
 // Update the blog with id
 export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
-  const { id } = await params;
-  // I want to use search with key to change the specific field
-  const searchParams = req.nextUrl.searchParams;
-  const key = searchParams.get('key');
-  // if has key, then update one field, otherwise, update all fields
-  if (key) {
-    console.log("Update one field");
-    console.log(key);
-    const value = await req.text();
-    console.log(value);
-    const result = await sql`UPDATE blogs SET ${key} = ${value} WHERE id = ${id}`;
-    console.log(result);
+  try {
+    const { id } = await params;
+    const searchParams = req.nextUrl.searchParams;
+    const key = searchParams.get('key');
+    // if has key, then update one field, otherwise, update all fields
+    if (key) {
+      const value = await req.text();
+      await sql`UPDATE blogs SET ${key} = ${value} WHERE id = ${id}`;
+      return NextResponse.json({ id });
+    }
+    const { title, author, tag, description, keywords, cover_image_url }: {
+      title: string,
+      author: string | null,
+      tag: string,
+      description: string | null,
+      keywords: string[] | null,
+      cover_image_url: string | null,
+    } = await req.json();
+
+    const updated_at = Date.now();
+
+    await sql`UPDATE blogs SET title = ${title}, author = ${author}, tag = ${tag}, description = ${description}, keywords = ${keywords}, cover_image_url = ${cover_image_url}, updated_at = to_timestamp(${updated_at / 1000}) WHERE id = ${id}`;
+
     return NextResponse.json({ id });
+  } catch (error) {
+    console.log("Error:", error);
+    return NextResponse.json({ message: 'An error occurred in update blog' }, { status: 500 });
   }
-  const { title, author, tag, description, keywords, cover_image_url }: {
-    title: string,
-    author: string | null,
-    tag: string,
-    description: string | null,
-    keywords: string[] | null,
-    cover_image_url: string | null,
-  } = await req.json();
-
-
-  console.log(title, author, tag, description, keywords, cover_image_url);
-
-  const updated_at = Date.now();
-
-  const result = await sql`UPDATE blogs SET title = ${title}, author = ${author}, tag = ${tag}, description = ${description}, keywords = ${keywords}, cover_image_url = ${cover_image_url}, updated_at = to_timestamp(${updated_at / 1000}) WHERE id = ${id}`;
-  console.log(result);
-
-  return NextResponse.json({ id });
 };
 
 // Delete the blog with id
 export async function DELETE(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
-  const { id } = await params;
-  if (id === "example") {
+  try {
+    const { id } = await params;
+    if (id === "example") {
+      return NextResponse.json({ id });
+    }
+    await sql`DELETE FROM blogs WHERE id = ${id}`;
+
     return NextResponse.json({ id });
   }
-  const result = await sql`DELETE FROM blogs WHERE id = ${id}`;
-  console.log(result);
-
-  return NextResponse.json({ id });
+  catch (error) {
+    console.log("Error:", error);
+    return NextResponse.json({ message: 'An error occurred in delete blog' }, { status: 500 });
+  }
 };
 
 export const config = {

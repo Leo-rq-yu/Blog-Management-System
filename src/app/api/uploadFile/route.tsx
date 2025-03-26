@@ -23,7 +23,6 @@ export async function POST(req: Request) {
 
   try {
     const formData = await req.formData();
-    console.log("Form data:", formData);
     const file = formData.get(key) as File; // Assume the file input name is "image"
     if (!file) {
       return NextResponse.json({ error: "No file uploaded" }, { status: 400 });
@@ -32,7 +31,7 @@ export async function POST(req: Request) {
     const stream = file.stream();
     const ext = file.name.split(".").pop();
     const newFileName = `${uuidv4()}.${ext}`;
-    const s3Route = `assets/newsroom/images/${newFileName}`;
+    const s3Route = `${newFileName}`;
     const upload = new Upload({
       client: s3,
       params: {
@@ -43,13 +42,12 @@ export async function POST(req: Request) {
       },
     });
 
-    const result = await upload.done();
-    console.log("S3 upload result:", result);
+    await upload.done();
     const fileUrl = `${process.env.NEXT_PUBLIC_CDN_URL}/${s3Route}`;
 
     return NextResponse.json({ success: 1, file: { url: fileUrl } });
   } catch (error) {
-    console.error("Error:", error);
+    console.log("Error:", error);
     return NextResponse.json({ error: "An error occurred" }, { status: 500 });
   }
 }

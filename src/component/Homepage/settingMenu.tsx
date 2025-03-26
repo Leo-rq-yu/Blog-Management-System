@@ -46,7 +46,6 @@ const SettingMenu = ({ blog }: { blog: Blog }) => {
   };
 
   const handleCancel = () => {
-    console.log("Delete canceled");
     setConfirmModal(false);
   };
 

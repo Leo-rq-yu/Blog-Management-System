@@ -66,9 +66,6 @@ export default async function EditorPage({
     blog = await blogResponse.json();
   }
 
-  console.log("data get from server");
-  console.log(blog);
-
   return (
     <BlogContentProvider>
       <div className="flex flex-col h-screen bg-zinc-100">
