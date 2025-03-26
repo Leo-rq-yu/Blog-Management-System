@@ -90,9 +90,6 @@ NEXT_PUBLIC_S3_BUCKET_NAME=your-s3-bucket-name
 # AWS S3 region where your bucket is hosted (e.g., us-east-1)
 NEXT_PUBLIC_S3_REGION=us-east-1
 
-# Public URL for your S3 bucket (e.g., https://your-s3-bucket-name.s3.amazonaws.com)
-NEXT_PUBLIC_S3_URL=https://your-s3-bucket-name.s3.amazonaws.com
-
 # AWS credentials for accessing S3 (Keep these secret and add your .env file to .gitignore)
 AWS_ACCESS_KEY_ID=your-aws-access-key-id
 AWS_SECRET_ACCESS_KEY=your-aws-secret-access-key
