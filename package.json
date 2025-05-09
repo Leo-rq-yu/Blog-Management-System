@@ -30,7 +30,7 @@
     "antd": "^5.24.4",
     "editorjs-inline-image": "^2.2.2",
     "formidable": "^3.5.2",
-    "next": "15.2.3",
+    "next": "^15.3.2",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "turndown": "^7.2.0",

@@ -206,14 +206,16 @@ export const DEFAULT_BLOG_CONTENT: { blocks: Block[] } = {
       }
     },
     {
-      "id": "-0quBl4snX",
+      "id": "BjOdUVLlK3",
       "type": "image",
       "data": {
-        "url": "https://d43vvod2st23c.cloudfront.net/f7c9790b3139a8f22c06ff0740241f64.png",
         "caption": "This is a caption",
         "withBorder": false,
         "withBackground": false,
-        "stretched": false
+        "stretched": false,
+        "file": {
+          "url": "https://aristai-static-resources.s3.us-east-2.amazonaws.com/assets/newsroom/images/13666adb-ff56-4d13-af29-6a713b0740a1.png"
+        }
       }
     },
     {
