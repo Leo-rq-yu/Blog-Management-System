@@ -65,7 +65,7 @@ const EditableTitle = () => {
             onClick={handleEdit}
             className="cursor-pointer p-2 hover:bg-gray-100 rounded"
           >
-            <p className="line-clamp-1">{title}</p>
+            <p className="line-clamp-1 text-center">{title}</p>
           </div>
         )}
       </div>
