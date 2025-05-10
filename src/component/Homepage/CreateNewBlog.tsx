@@ -2,7 +2,7 @@
 import React, { useState } from "react";
 import { Modal } from "antd";
 import dynamic from "next/dynamic";
-const CreateBlogForm = dynamic(() => import("./CreateBlogForm"));
+const BlogForm = dynamic(() => import("./BlogForm"));
 
 const CreateNewBlogButton = () => {
   const [openModal, setOpenModal] = useState(false);
@@ -37,7 +37,7 @@ const CreateNewBlogButton = () => {
         onCancel={() => setOpenModal(false)}
       >
         <div className="p-4">
-          <CreateBlogForm closeModel={() => setOpenModal(false)} />
+          <BlogForm closeModel={() => setOpenModal(false)} isEdit={false} />
         </div>
       </Modal>
     </>

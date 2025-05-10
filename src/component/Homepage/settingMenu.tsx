@@ -1,5 +1,5 @@
 "use client";
-import EditBlogForm from "@/component/Homepage/EditBlogForm";
+import BlogForm from "./BlogForm";
 import { Button, Dropdown, type MenuProps, notification, Modal } from "antd";
 import {
   DeleteOutlined,
@@ -94,7 +94,7 @@ const SettingMenu = ({ blog }: { blog: Blog }) => {
         onCancel={() => setEditModal(false)}
       >
         <div className="p-4">
-          <EditBlogForm blog={blog} closeModel={() => setEditModal(false)} />
+          <BlogForm blog={blog} closeModel={() => setEditModal(false)} isEdit={true} />
         </div>
       </Modal>
     </>

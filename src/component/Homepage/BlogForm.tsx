@@ -26,12 +26,13 @@ type FieldType = {
   cover_image_url?: UploadFile[];
 };
 
-interface EditBlogFormProps {
-  blog: Blog;
+interface BlogFormProps {
+  blog?: Blog;
   closeModel: () => void;
+  isEdit?: boolean;
 }
 
-const EditBlogForm = ({ closeModel, blog }: EditBlogFormProps) => {
+const BlogForm = ({ closeModel, blog, isEdit = false }: BlogFormProps) => {
   const router = useRouter();
   const [form] = Form.useForm();
   const [api, contextHolder] = notification.useNotification();
@@ -53,31 +54,86 @@ const EditBlogForm = ({ closeModel, blog }: EditBlogFormProps) => {
       setLoading(false);
       return;
     }
-    const response = await fetch(`/api/blog/${blog.id}`, {
-      method: "PUT",
-      body: JSON.stringify({
-        title: values.title,
-        author: values.author,
-        tag: values.tag,
-        description: values.description,
-        keywords: values.keywords,
-        cover_image_url: values.cover_image_url?.[0]?.url,
-      }),
-    });
-    if (response.status !== 200) {
-      api.error({
-        message: "Failed to create blog",
-        description: "Please try again later",
-      });
-      setLoading(false);
-      return;
-    }
 
-    await response.json();
-    setLoading(false);
-    router.refresh();
-    closeModel();
+    if (isEdit && blog) {
+      // Edit existing blog
+      const response = await fetch(`/api/blog/${blog.id}`, {
+        method: "PUT",
+        body: JSON.stringify({
+          title: values.title,
+          author: values.author,
+          tag: values.tag,
+          description: values.description,
+          keywords: values.keywords,
+          cover_image_url: values.cover_image_url?.[0]?.url,
+        }),
+      });
+      
+      if (response.status !== 200) {
+        api.error({
+          message: "Failed to update blog",
+          description: "Please try again later",
+        });
+        setLoading(false);
+        return;
+      }
+
+      await response.json();
+      setLoading(false);
+      router.refresh();
+      closeModel();
+    } else {
+      // Create new blog
+      const created_at = Date.now();
+      const response = await fetch("/api/blog", {
+        method: "POST",
+        body: JSON.stringify({
+          title: values.title,
+          author: values.author,
+          tag: values.tag,
+          description: values.description,
+          keywords: values.keywords,
+          cover_image_url: values.cover_image_url?.[0]?.url,
+          created_at,
+        }),
+      });
+      
+      if (response.status !== 200) {
+        api.error({
+          message: "Failed to create blog",
+          description: "Please try again later",
+        });
+        setLoading(false);
+        return;
+      }
+
+      const data: { id: string } = await response.json();
+      setLoading(false);
+      router.push(`/editor/${data.id}`);
+      closeModel();
+    }
   };
+
+  // Prepare initial values for edit mode
+  const initialValues = isEdit && blog
+    ? {
+        title: blog.title,
+        author: blog.author,
+        tag: blog.tag,
+        description: blog.description,
+        keywords: blog.keywords?.split("; "),
+        cover_image_url: blog.cover_image_url
+          ? [
+              {
+                uid: "1",
+                name: blog.title + " blog cover",
+                status: "done",
+                url: blog.cover_image_url,
+              },
+            ]
+          : undefined,
+      }
+    : undefined;
 
   return (
     <>
@@ -87,22 +143,7 @@ const EditBlogForm = ({ closeModel, blog }: EditBlogFormProps) => {
           form={form}
           layout="vertical"
           onFinish={handleSubmit}
-          initialValues={{
-            title: blog.title,
-            author: blog.author,
-            tag: blog.tag,
-            description: blog.description,
-            // split by ; to convert string to array
-            keywords: blog.keywords?.split("; "),
-            cover_image_url: [
-              {
-                uid: "1",
-                name: blog.title + "blog cover",
-                status: "done",
-                url: blog.cover_image_url,
-              },
-            ],
-          }}
+          initialValues={initialValues}
         >
           <Form.Item<FieldType>
             label="Title"
@@ -201,13 +242,9 @@ const EditBlogForm = ({ closeModel, blog }: EditBlogFormProps) => {
               </p>
             </Upload.Dragger>
           </Form.Item>
-          <Form.Item<FieldType> label={null}>
-            <Button
-              type="primary"
-              htmlType="submit"
-              block
-            >
-              Submit
+          <Form.Item label={null}>
+            <Button type="primary" htmlType="submit" block>
+              {isEdit ? "Update" : "Submit"}
             </Button>
           </Form.Item>
         </Form>
@@ -216,4 +253,4 @@ const EditBlogForm = ({ closeModel, blog }: EditBlogFormProps) => {
   );
 };
 
-export default EditBlogForm;
+export default BlogForm;

@@ -2,7 +2,7 @@
 import { useState } from "react";
 import type { Blog } from "@/lib/blogType";
 import { TimeStrConvertion } from "@/utils/timeFunc";
-import EditBlogForm from "@/component/Homepage/EditBlogForm";
+import BlogForm from "./BlogForm";
 import Link from "next/link";
 import { Card, notification, Modal, Image } from "antd";
 import {
@@ -113,7 +113,7 @@ const BlogCard = ({ blog }: BlogCardProps) => {
         onCancel={() => setEditModal(false)}
       >
         <div className="p-4">
-          <EditBlogForm blog={blog} closeModel={() => setEditModal(false)} />
+          <BlogForm blog={blog} closeModel={() => setEditModal(false)} isEdit={true} />
         </div>
       </Modal>
     </>
