@@ -38,7 +38,7 @@ const EditorPageUI = ({ blog }: { blog: Blog }) => {
         style={{ margin: "0 2rem 1rem 0", backgroundColor: "#fff" }}
       >
         <p className="text-black font-semibold text-xl w-[calc(100%-16px)] text-center py-2 mx-2 border-b border-gray-300">Editor Panel</p>
-        <Editor editorblock="editorjs-container" />
+        <Editor editorblock="editorjs-container" data={blog}/>
       </Splitter.Panel>
       <Splitter.Panel
         defaultSize="60%"

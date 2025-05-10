@@ -1,6 +1,6 @@
 import { Metadata } from "next";
 import { BlogContentProvider } from "@/component/context/BlogContantContext";
-import EditorPageUI from "@/component/EditorPage/EditerPageUI";
+import EditorPageUI from "@/component/EditorPage/EditorPageUI";
 import EditorPageHeader from "@/component/EditorPage/header";
 import { type Blog, DEFAULT_BLOG } from "@/lib/blogType";
 

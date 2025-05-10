@@ -4,13 +4,15 @@ import { useBlogContent } from "./context/BlogContantContext";
 import { useEffect, useRef, memo } from "react";
 import EditorJS from "@editorjs/editorjs";
 import { EDITOR_JS_TOOLS } from "@/utils/tools";
+import type { Blog } from "@/lib/blogType";
 
 interface EditorProps {
   editorblock: string;
+  data: Blog;
 }
 
-const Editor = ({ editorblock }: EditorProps) => {
-  const { data, setData } = useBlogContent();
+const Editor = ({ editorblock, data }: EditorProps) => {
+  const { setData } = useBlogContent();
   const ejInstance = useRef<EditorJS | null>(null);
 
   useEffect(() => {
@@ -20,7 +22,7 @@ const Editor = ({ editorblock }: EditorProps) => {
       const editor = new EditorJS({
         holder: editorblock,
         data: {
-          time: data.updated_at,
+          time: new Date(data.updated_at).getTime(),
           blocks: data.blocks,
         },
         onReady: async () => {
@@ -50,7 +52,7 @@ const Editor = ({ editorblock }: EditorProps) => {
         ejInstance.current.destroy();
       }
     };
-  }, [editorblock]);
+  }, [editorblock, data, setData]);
 
   return <div className="flex-1 h-full px-20 min-w-3/5" id={editorblock} />;
 };
